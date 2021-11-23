@@ -5,8 +5,8 @@ public class Constantes {
     public static final int TAMANHO_BLOCO = 6;
 
     public static final int[] PERMUTACAO = {
-            48, 2 , 3 , 4 , 5 , 24,
-            7 , 8 , 9 , 10, 11, 12,
+            48, 2 , 9 , 4 , 5 , 24,
+            7 , 8 , 3 , 10, 11, 12,
             13, 14, 15, 16, 17, 18,
             19, 20, 21, 22, 23, 29,
             25, 26, 27, 28, 6 , 30,
@@ -16,8 +16,8 @@ public class Constantes {
     };
 
     public static final int[] PERMUTACAO_INVERSA = {
-            48, 2 , 3 , 4 , 5 , 29 , //6
-            7 , 8 , 9 , 10, 11, 12, //12
+            48, 2 , 9 , 4 , 5 , 29 , //6
+            7 , 8 , 3 , 10, 11, 12, //12
             13, 14, 15, 16, 17, 18, //18
             19, 20, 21, 22, 23, 6 , //24
             25, 26, 27, 28, 24, 30, //30

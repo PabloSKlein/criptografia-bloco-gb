@@ -13,7 +13,7 @@ public class DES {
     public static String cifra(String texto, String chave) {
         int i;
         // Chave das rodadas
-        var keys = geraSubChaves(chave);
+        var subChaves = geraSubChaves(chave);
 
         // Permutacao
         texto = permutar(PERMUTACAO, texto);
@@ -23,7 +23,7 @@ public class DES {
                 + texto.substring(TAMANHO_BLOCO, TAMANHO_BLOCO * 2).toUpperCase() + "\n");
 
         for (i = 0; i < TAMANHO_BLOCO * 2; i++) {
-            texto = round(texto, keys[i], i);
+            texto = round(texto, subChaves[i], i);
         }
 
         // Swap
@@ -54,19 +54,15 @@ public class DES {
         return texto;
     }
 
-    // per-mutate input hexadecimal
-    // according to specified sequence
-    private static String permutar(int[] sequence, String input) {
-        String output = "";
-        input = hextoBin(input);
+    private static String permutar(int[] tabela, String texto) {
+        var output = new StringBuilder();
+        texto = hextoBin(texto);
 
-        try {
-            for (int i = 0; i < sequence.length; i++)
-                output += input.charAt(sequence[i] - 1);
-        } catch (Exception e) {
-            throw e;
+        for (int i : tabela) {
+            output.append(texto.charAt(i - 1));
         }
-        return binToHex(output);
+
+        return binToHex(output.toString());
     }
 
     // xor 2 hexadecimal strings
@@ -113,33 +109,31 @@ public class DES {
     private static String sBox(String input) {
         StringBuilder output = new StringBuilder();
         input = hextoBin(input);
-        for (int i = 0; i < 24; i += 6) {
-            String temp = input.substring(i, i + 6);
-            int num = i / 6;
-            int row = Integer.parseInt(
-                    temp.charAt(0) + "" + temp.charAt(5), 2);
-            int col = Integer.parseInt(
-                    temp.substring(1, 5), 2);
-            output.append(Integer.toHexString(
-                    SBOX[num][row][col]));
+        for (int i = 0; i < 24; i += TAMANHO_BLOCO) {
+            String temp = input.substring(i, i + TAMANHO_BLOCO);
+            int num = i / TAMANHO_BLOCO;
+            int row = Integer.parseInt(temp.charAt(0) + "" + temp.charAt(5), 2);
+            int col = Integer.parseInt(temp.substring(1, 5), 2);
+            output.append(Integer.toHexString(SBOX[num][row][col]));
         }
         return output.toString();
     }
 
-    private static String round(String input, String key, int num) {
-        // fk
-        String left = input.substring(0, 6);
-        String temp = input.substring(6, 12);
-        String right = temp;
-        // xor temp and round key
-        temp = xor(temp, key);
+    private static String round(String texto, String chave, int num) {
+        var left = texto.substring(0, TAMANHO_BLOCO);
+        var temp = texto.substring(TAMANHO_BLOCO, TAMANHO_BLOCO * 2);
+        var right = temp;
+
+        // xor temp and round chave
+        temp = xor(temp, chave);
         // lookup in s-box table
         temp = sBox(temp);
         // xor
         left = xor(left, temp);
-        System.out.println("Round " + (num + 1) + " " + right.toUpperCase() + " " + left.toUpperCase() + " " + key.toUpperCase());
 
-        // swapper
+        System.out.println("Round " + (num + 1) + " " + right.toUpperCase() + " " + left.toUpperCase() + " " + chave.toUpperCase());
+
+        // Swap
         return right + left;
     }
 }
