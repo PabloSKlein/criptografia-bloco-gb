@@ -56,6 +56,7 @@ public class DES {
 
     private static String permutar(int[] tabela, String texto) {
         var output = new StringBuilder();
+
         texto = hextoBin(texto);
 
         for (int i : tabela) {
@@ -94,23 +95,23 @@ public class DES {
         return input;
     }
 
-    private static String[] geraSubChaves(String key) {
-        String[] keys = new String[12];
+    private static String[] geraSubChaves(String chave) {
+        var subChaves = new String[TAMANHO_BLOCO * 2];
 
-        key = permutar(PERMUTACAO_CHAVE, key);
-        for (int i = 0; i < 12; i++) {
-            key = leftCircularShift(key.substring(0, 7), SHIFT_BITS[i])
-                    + leftCircularShift(key.substring(7, 14), SHIFT_BITS[i]);
-            keys[i] = permutar(PERMUTACAO_CHAVE_2, key);
+        chave = permutar(PERMUTACAO_CHAVE, chave);
+        for (int i = 0; i < TAMANHO_BLOCO * 2; i++) {
+            chave = leftCircularShift(chave.substring(0, 7), SHIFT_BITS[i])
+                    + leftCircularShift(chave.substring(7, 14), SHIFT_BITS[i]);
+            subChaves[i] = permutar(PERMUTACAO_CHAVE_2, chave);
         }
-        return keys;
+        return subChaves;
     }
 
-    private static String sBox(String input) {
-        StringBuilder output = new StringBuilder();
-        input = hextoBin(input);
+    private static String sBox(String texto) {
+        var output = new StringBuilder();
+        texto = hextoBin(texto);
         for (int i = 0; i < 24; i += TAMANHO_BLOCO) {
-            String temp = input.substring(i, i + TAMANHO_BLOCO);
+            var temp = texto.substring(i, i + TAMANHO_BLOCO);
             int num = i / TAMANHO_BLOCO;
             int row = Integer.parseInt(temp.charAt(0) + "" + temp.charAt(5), 2);
             int col = Integer.parseInt(temp.substring(1, 5), 2);
@@ -119,7 +120,7 @@ public class DES {
         return output.toString();
     }
 
-    private static String round(String texto, String chave, int num) {
+    private static String round(String texto, String chave, int round) {
         var left = texto.substring(0, TAMANHO_BLOCO);
         var temp = texto.substring(TAMANHO_BLOCO, TAMANHO_BLOCO * 2);
         var right = temp;
@@ -131,7 +132,7 @@ public class DES {
         // xor
         left = xor(left, temp);
 
-        System.out.println("Round " + (num + 1) + " " + right.toUpperCase() + " " + left.toUpperCase() + " " + chave.toUpperCase());
+        System.out.println("Round " + (round + 1) + " " + right.toUpperCase() + " " + left.toUpperCase() + " " + chave.toUpperCase());
 
         // Swap
         return right + left;

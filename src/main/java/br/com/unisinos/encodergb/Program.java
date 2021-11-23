@@ -2,7 +2,7 @@ package br.com.unisinos.encodergb;
 
 public class Program {
     public static void main(String args[]) {
-        String texto = "123456ABCD13";
+        String texto = "123456ABCD1A";
         String chave = "AABB09182736CCDD";
         System.out.println("\nTexto a cifrar: " + texto.toUpperCase());
 

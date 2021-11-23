@@ -5,8 +5,9 @@ public class Conversao {
     public static String hextoBin(String input) {
         int n = input.length() * 4;
         input = Long.toBinaryString(Long.parseUnsignedLong(input, 16));
-        while (input.length() < n)
+        while (input.length() < n) {
             input = "0" + input;
+        }
         return input;
     }
 
@@ -14,8 +15,9 @@ public class Conversao {
     public static String binToHex(String input) {
         int n = input.length() / 4;
         input = Long.toHexString(Long.parseUnsignedLong(input, 2));
-        while (input.length() < n)
+        while (input.length() < n) {
             input = "0" + input;
+        }
         return input;
     }
 }
