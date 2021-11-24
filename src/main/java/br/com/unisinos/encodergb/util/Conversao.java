@@ -2,7 +2,7 @@ package br.com.unisinos.encodergb.util;
 
 public class Conversao {
     // hexadecimal to binary conversion
-    public static String hextoBin(String input) {
+    public static String hexToBin(String input) {
         int n = input.length() * 4;
         input = Long.toBinaryString(Long.parseUnsignedLong(input, 16));
         while (input.length() < n) {

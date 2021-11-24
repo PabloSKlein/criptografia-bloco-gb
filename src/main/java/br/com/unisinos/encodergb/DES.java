@@ -5,16 +5,16 @@ import lombok.NoArgsConstructor;
 
 import static br.com.unisinos.encodergb.util.Constantes.*;
 import static br.com.unisinos.encodergb.util.Conversao.binToHex;
-import static br.com.unisinos.encodergb.util.Conversao.hextoBin;
+import static br.com.unisinos.encodergb.util.Conversao.hexToBin;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class DES {
 
     public static String cifra(String texto, String chave) {
-        int i;
         // Chave das rodadas
         var subChaves = geraSubChaves(chave);
 
+        int i;
         // Permutacao
         texto = permutar(PERMUTACAO, texto);
 
@@ -57,7 +57,7 @@ public class DES {
     private static String permutar(int[] tabela, String texto) {
         var output = new StringBuilder();
 
-        texto = hextoBin(texto);
+        texto = hexToBin(texto);
 
         for (int i : tabela) {
             output.append(texto.charAt(i - 1));
@@ -66,33 +66,34 @@ public class DES {
         return binToHex(output.toString());
     }
 
-    // xor 2 hexadecimal strings
+    // xor
     private static String xor(String a, String b) {
         // hexadecimal to decimal(base 10)
-        var t_a = Long.parseUnsignedLong(a, 16);
+        var hexaA = Long.parseUnsignedLong(a, 16);
         // hexadecimal to decimal(base 10)
-        var t_b = Long.parseUnsignedLong(b, 16);
+        var hexaB = Long.parseUnsignedLong(b, 16);
         // xor
-        t_a = t_a ^ t_b;
-        // decimal to hexadecimal
-        // prepend 0's to maintain length
-        StringBuilder aBuilder = new StringBuilder(Long.toHexString(t_a));
-        while (aBuilder.length() < b.length())
-            aBuilder.insert(0, "0");
-        a = aBuilder.toString();
+        var builder = new StringBuilder(Long.toHexString(hexaA ^ hexaB));
+
+        //padding zeros
+        while (builder.length() < b.length()) {
+            builder.insert(0, "0");
+        }
+        a = builder.toString();
         return a;
     }
 
-    // left Circular Shifting bits
-    private static String leftCircularShift(String input, int numBits) {
-        int n = input.length() * 4;
-        int[] perm = new int[n];
-        for (int i = 0; i < n - 1; i++)
-            perm[i] = (i + 2);
-        perm[n - 1] = 1;
-        while (numBits-- > 0)
-            input = permutar(perm, input);
-        return input;
+    private static String leftCircularShift(String texto, int numBits) {
+        var n = texto.length() * 4;
+        var permutacao = new int[n];
+        for (int i = 0; i < n - 1; i++) {
+            permutacao[i] = (i + 2);
+        }
+        permutacao[n - 1] = 1;
+        while (numBits-- > 0) {
+            texto = permutar(permutacao, texto);
+        }
+        return texto;
     }
 
     private static String[] geraSubChaves(String chave) {
@@ -100,8 +101,8 @@ public class DES {
 
         chave = permutar(PERMUTACAO_CHAVE, chave);
         for (int i = 0; i < TAMANHO_BLOCO * 2; i++) {
-            chave = leftCircularShift(chave.substring(0, 7), SHIFT_BITS[i])
-                    + leftCircularShift(chave.substring(7, 14), SHIFT_BITS[i]);
+            chave = leftCircularShift(chave.substring(0, 4), SHIFT_BITS[i])
+                    + leftCircularShift(chave.substring(4, 8), SHIFT_BITS[i]);
             subChaves[i] = permutar(PERMUTACAO_CHAVE_2, chave);
         }
         return subChaves;
@@ -109,7 +110,7 @@ public class DES {
 
     private static String sBox(String texto) {
         var output = new StringBuilder();
-        texto = hextoBin(texto);
+        texto = hexToBin(texto);
         for (int i = 0; i < 24; i += TAMANHO_BLOCO) {
             var temp = texto.substring(i, i + TAMANHO_BLOCO);
             int num = i / TAMANHO_BLOCO;
@@ -125,11 +126,8 @@ public class DES {
         var temp = texto.substring(TAMANHO_BLOCO, TAMANHO_BLOCO * 2);
         var right = temp;
 
-        // xor temp and round chave
         temp = xor(temp, chave);
-        // lookup in s-box table
         temp = sBox(temp);
-        // xor
         left = xor(left, temp);
 
         System.out.println("Round " + (round + 1) + " " + right.toUpperCase() + " " + left.toUpperCase() + " " + chave.toUpperCase());
