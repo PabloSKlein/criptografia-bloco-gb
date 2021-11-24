@@ -1,10 +1,9 @@
 package br.com.unisinos.encodergb;
 
 public class Program {
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         var texto = "ABCDEF123456CD2077";
-        //var texto = "123456ABCD1A";
-        String chave = "A07DA07D";
+        var chave = "A07DA07D";
         System.out.println("\nTexto a cifrar: " + texto.toUpperCase());
 
         System.out.println("Crifrar:\n");

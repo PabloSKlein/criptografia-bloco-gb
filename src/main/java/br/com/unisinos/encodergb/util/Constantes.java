@@ -7,17 +7,17 @@ public class Constantes {
     public static final int RODADAS = 12;
 
     public static final int[] PERMUTACAO = {
-            24 , 9 , 3 , 6 , 4 , 5 , //6
+            24 , 9 , 3 , 6 , 4 , 5 ,//6
             7 , 8 , 2 , 10, 11, 12, //12
             13, 18, 15, 22, 17, 14, //18
-            19, 20, 21, 16, 23, 1 //24
+            19, 20, 21, 16, 23, 1   //24
     };
 
     public static final int[] PERMUTACAO_INVERSA = {
             24, 9 , 3 , 5 , 6 , 4 , //6
             7 , 8 , 2 , 10, 11, 12, //12
             13, 18, 15, 22, 17, 14, //18
-            19, 20, 21, 16, 23 , 1   //24
+            19, 20, 21, 16, 23 , 1  //24
     };
 
     public static final int[] PERMUTACAO_CHAVE = {
