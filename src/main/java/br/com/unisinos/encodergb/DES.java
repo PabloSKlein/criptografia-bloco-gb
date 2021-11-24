@@ -11,44 +11,63 @@ import static br.com.unisinos.encodergb.util.Conversao.hexToBin;
 public class DES {
 
     public static String cifra(String texto, String chave) {
-        // Chave das rodadas
         var subChaves = geraSubChaves(chave);
 
-        int i;
-        // Permutacao
+        var textoCifrado = new StringBuilder();
+        for (int i = 0; i < texto.length(); i += TAMANHO_BLOCO) {
+            var bloco = texto.substring(i, i + TAMANHO_BLOCO);
+            System.out.println("Bloco " + texto.substring(i, i + TAMANHO_BLOCO));
+            textoCifrado.append(cifraBloco(bloco, subChaves));
+        }
+
+        return textoCifrado.toString();
+    }
+
+    public static String decifra(String texto, String chave) {
+        var subChaves = geraSubChaves(chave);
+
+        var textoDecifrado = new StringBuilder();
+        for (int i = 0; i < texto.length(); i += TAMANHO_BLOCO) {
+            var bloco = texto.substring(i, i + TAMANHO_BLOCO);
+            System.out.println("Bloco " + texto.substring(i, i + TAMANHO_BLOCO));
+            textoDecifrado.append(decifraBloco(bloco, subChaves));
+        }
+
+        return textoDecifrado.toString();
+    }
+
+    private static String cifraBloco(String texto, String[] subChaves) {
         texto = permutar(PERMUTACAO, texto);
 
         System.out.println("Primeira permutacao: " + texto.toUpperCase());
-        System.out.println("Bloco L/R: L0=" + texto.substring(0, TAMANHO_BLOCO).toUpperCase() + " R0="
-                + texto.substring(TAMANHO_BLOCO, TAMANHO_BLOCO * 2).toUpperCase() + "\n");
+        System.out.println("Bloco L/R: L0=" + texto.substring(0, MEIO_BLOCO).toUpperCase() + " R0="
+                + texto.substring(MEIO_BLOCO, TAMANHO_BLOCO).toUpperCase() + "\n");
 
-        for (i = 0; i < TAMANHO_BLOCO * 2; i++) {
+        for (int i = 0; i < RODADAS; i++) {
             texto = round(texto, subChaves[i], i);
         }
 
         // Swap
-        texto = texto.substring(TAMANHO_BLOCO, TAMANHO_BLOCO * 2) + texto.substring(0, TAMANHO_BLOCO);
+        texto = texto.substring(MEIO_BLOCO, TAMANHO_BLOCO) + texto.substring(0, MEIO_BLOCO);
 
         texto = permutar(PERMUTACAO_INVERSA, texto);
         return texto;
     }
 
-    public static String decifra(String texto, String chave) {
-        var keys = geraSubChaves(chave);
-
+    private static String decifraBloco(String texto, String[] keys) {
         texto = permutar(PERMUTACAO, texto);
 
         System.out.println("Primeira permutacao: " + texto.toUpperCase());
-        System.out.println("Bloco L/R: L0=" + texto.substring(0, TAMANHO_BLOCO).toUpperCase() + " R0="
-                + texto.substring(TAMANHO_BLOCO, TAMANHO_BLOCO * 2).toUpperCase() + "\n");
+        System.out.println("Bloco L/R: L0=" + texto.substring(0, MEIO_BLOCO).toUpperCase() + " R0="
+                + texto.substring(MEIO_BLOCO, TAMANHO_BLOCO).toUpperCase() + "\n");
 
         //Inverte rounds
-        for (int i = 11; i > -1; i--) {
-            texto = round(texto, keys[i], 11 - i);
+        for (int i = RODADAS - 1; i > -1; i--) {
+            texto = round(texto, keys[i], (RODADAS - 1) - i);
         }
 
         // Swap
-        texto = texto.substring(TAMANHO_BLOCO, TAMANHO_BLOCO * 2) + texto.substring(0, TAMANHO_BLOCO);
+        texto = texto.substring(MEIO_BLOCO, TAMANHO_BLOCO) + texto.substring(0, MEIO_BLOCO);
 
         texto = permutar(PERMUTACAO_INVERSA, texto);
         return texto;
@@ -97,10 +116,10 @@ public class DES {
     }
 
     private static String[] geraSubChaves(String chave) {
-        var subChaves = new String[TAMANHO_BLOCO * 2];
+        var subChaves = new String[RODADAS];
 
         chave = permutar(PERMUTACAO_CHAVE, chave);
-        for (int i = 0; i < TAMANHO_BLOCO * 2; i++) {
+        for (int i = 0; i < RODADAS; i++) {
             chave = leftCircularShift(chave.substring(0, 4), SHIFT_BITS[i])
                     + leftCircularShift(chave.substring(4, 8), SHIFT_BITS[i]);
             subChaves[i] = permutar(PERMUTACAO_CHAVE_2, chave);
@@ -111,7 +130,7 @@ public class DES {
     private static String sBox(String texto) {
         var output = new StringBuilder();
         texto = hexToBin(texto);
-        for (int i = 0; i < 24; i += TAMANHO_BLOCO) {
+        for (int i = 0; i < 12; i += TAMANHO_BLOCO) {
             var temp = texto.substring(i, i + TAMANHO_BLOCO);
             int num = i / TAMANHO_BLOCO;
             int row = Integer.parseInt(temp.charAt(0) + "" + temp.charAt(5), 2);
@@ -122,17 +141,25 @@ public class DES {
     }
 
     private static String round(String texto, String chave, int round) {
-        var left = texto.substring(0, TAMANHO_BLOCO);
-        var temp = texto.substring(TAMANHO_BLOCO, TAMANHO_BLOCO * 2);
-        var right = temp;
+        var left = texto.substring(0, MEIO_BLOCO);
+        var right = texto.substring(MEIO_BLOCO, TAMANHO_BLOCO);
 
-        temp = xor(temp, chave);
+        var temp = xor(right, chave);
         temp = sBox(temp);
-        left = xor(left, temp);
+
+        left = paddingRight(xor(left, temp));
+        right = paddingRight(right);
 
         System.out.println("Round " + (round + 1) + " " + right.toUpperCase() + " " + left.toUpperCase() + " " + chave.toUpperCase());
 
         // Swap
         return right + left;
+    }
+
+    private static String paddingRight(String texto) {
+        while (texto.length() < 3) {
+            texto = "0".concat(texto);
+        }
+        return texto;
     }
 }

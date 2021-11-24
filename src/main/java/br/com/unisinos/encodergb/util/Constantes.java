@@ -3,27 +3,21 @@ package br.com.unisinos.encodergb.util;
 public class Constantes {
 
     public static final int TAMANHO_BLOCO = 6;
+    public static final int MEIO_BLOCO = TAMANHO_BLOCO / 2;
+    public static final int RODADAS = 12;
 
     public static final int[] PERMUTACAO = {
-            48, 2 , 9 , 4 , 5 , 24,
-            7 , 8 , 3 , 10, 11, 12,
-            13, 14, 15, 16, 17, 18,
-            19, 20, 21, 22, 23, 29,
-            25, 26, 27, 28, 6 , 30,
-            31, 32, 33, 34, 35, 36,
-            37, 38, 39, 40, 41, 42,
-            43, 44, 45, 46, 47, 1
+            24 , 9 , 3 , 6 , 4 , 5 , //6
+            7 , 8 , 2 , 10, 11, 12, //12
+            13, 18, 15, 22, 17, 14, //18
+            19, 20, 21, 16, 23, 1 //24
     };
 
     public static final int[] PERMUTACAO_INVERSA = {
-            48, 2 , 9 , 4 , 5 , 29 , //6
-            7 , 8 , 3 , 10, 11, 12, //12
-            13, 14, 15, 16, 17, 18, //18
-            19, 20, 21, 22, 23, 6 , //24
-            25, 26, 27, 28, 24, 30, //30
-            31, 32, 33, 34, 35, 36, //36
-            37, 38, 39, 40, 41, 42, //42
-            43, 44, 45, 46, 47, 1   //48
+            24, 9 , 3 , 5 , 6 , 4 , //6
+            7 , 8 , 2 , 10, 11, 12, //12
+            13, 18, 15, 22, 17, 14, //18
+            19, 20, 21, 16, 23 , 1   //24
     };
 
     public static final int[] PERMUTACAO_CHAVE = {
